@@ -1,0 +1,8 @@
+{
+    "images":[{"path": "https://res.cloudinary.com/shufersal/image/upload/f_auto,q_auto/v1551800922/prod/product_images/products_zoom/ZCP52_Z_P_7296073385110_1.png", "descreption": "Shushan", "color": "red", "cost": "25$"},
+        {"path": "https://www.zer4u.co.il/Media/Uploads/8017380021(3).jpg", "descreption": "Dalya", "color": "yellow", "cost": "35$"},
+        {"path": "https://hadasf.co.il/wp-content/uploads/2018/07/104_600.jpg", "descreption": "Kash", "color": "yellow/red", "cost": "40$"},
+        {"path": "https://hateva.co.il/wp-content/uploads/2018/11/IMG_1902-e1542558598158-450x675.jpg", "descreption": "Lotus", "color": "blue/white", "cost": "80$"}]
+
+
+}

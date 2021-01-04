@@ -1,0 +1,158 @@
+
+<div class="container">  
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>User name</th>
+        <th>Password</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% managers.forEach(function(manager){ %>
+        <% if(manager.active) { %>
+      <tr id="node">
+        <td><%= manager.userName %></td>
+        <td><%= manager.password %></td>
+        <td><div class="container">
+          <div class="btn-group">
+            <% if(isManager){ %>
+            <button type="button" id="<%= manager.userName %>" onclick="deleteUserClick(this)" class="btn btn-primary">Delete</button>
+            <% } %>
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+              Manager <span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu">
+                <li><button type="button" onclick="employeeClick(this)" class="btn btn-primary">Employee</button></li>
+                <li><button type="button" onclick="customerClick(this)" class="btn btn-primary">Customers</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+         </td>
+      </tr>
+      <% } %>
+      <% }); %>
+      <% customers.forEach(function(customer){ %>
+        <% if(customer.active){ %>
+      <tr id="node">
+        <td><%= customer.userName %></td>
+        <td><%= customer.password %></td>
+        <td><div class="container">
+          <div class="btn-group">
+            <% if(isManager){ %>
+              <button type="button" id="<%= customer.userName %>" onclick="deleteUserClick(this)" class="btn btn-primary">Delete</button>
+              <% } %>
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                Customer <span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu">
+                <li><button type="button" onclick="employeeClick(this)" class="btn btn-primary">Employee</button></li>
+                <li><button type="button" onclick="managerClick(this)" class="btn btn-primary">Manager</button></li>
+              </ul>
+            </div>
+          </div>
+        </div></td>
+      </tr>
+      <% } %>
+      <% }); %>
+     
+      <% employees.forEach(function(employee){ %>
+        <% if(employee.active) { %> 
+        <tr id="node">
+          <td><%= employee.userName %></td>
+          <td><%= employee.password %></td>
+          <td><div class="container">
+            <div class="btn-group">
+              <% if(isManager){ %>
+                <button type="button" id="<%= employee.userName %>" onclick="deleteUserClick(this)" class="btn btn-primary">Delete</button>
+                <% } %>
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  Employee <span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><button type="button" onclick="customerClick(this)" class="btn btn-primary">Customer</button></li>
+                  <li><button type="button" onclick="managerClick(this)" class="btn btn-primary">Manager</button></li>
+                </ul>
+              </div>
+            </div>
+          </div></td>
+        </tr>
+        <% } %>
+        <% }); %>
+    </tbody>
+  </table>
+</div>
+<div id="loading" class="text-center">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<button type="button" onclick="addUsersClick(this)" class="btn btn-primary">Add users</button>
+<button id="refresh" type="button" onclick="refreshClick(this)" class="btn btn-primary">Refresh page</button>
+</br>
+<form id="addUsersForm">
+  <div class="form-row">
+    <div class="col">
+      <input type="text" class="form-control" id="userName" placeholder="User name">
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" id="password" placeholder="Password">
+    </div>
+    <div class="col">
+      <input type="button" class="btn btn-primary" onclick="addUser()" value="Add" placeholder="Add">
+    </div>
+    <div class="form-group col-md-4">      
+      <select id="role" class="form-control">
+        <option selected>Employee</option>
+        <option>Customer</option>
+        <% if(isManager){ %>
+        <option>Manager</option>
+        <% } %>
+      </select>
+    </div>
+  </div>
+</form>
+<script>
+  
+  
+  $("#loading").hide();  
+  $("#addUsersForm").hide();
+
+  function addUsersClick(elm) {
+    $("#addUsersForm").show();
+  }
+  async function addUser() {
+    $("#loading").show();  
+    $('button').prop('disabled', true);
+    $('refresh').prop('disabled', false);    
+    let newUser = {}
+    newUser["userName"] = $("#userName").val();
+    newUser["password"] = $("#password").val();
+    newUser["active"] = true;
+    let selected = document.getElementById("role");
+    let role = selected.options[selected.selectedIndex].text;
+    await fetch("http://localhost:8080/add",{
+    method:'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body :JSON.stringify({newUser: newUser, role: role})}).then(res =>{
+        if (!res.ok) {
+          alert(res.statusText);
+          $('button').prop('disabled', true);
+          $('refresh').prop('disabled', false);
+        }
+         else                              
+          $("#main").load("manageUsers");
+        }      
+    );
+    $("#loading").hide();
+    $('button').prop('disabled', false);
+}
+function refreshClick() {
+  $("#main").load("manageUsers");
+}
+</script>
+

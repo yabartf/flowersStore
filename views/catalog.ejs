@@ -1,0 +1,19 @@
+
+  <div class="container">    
+    <div class="row">      
+      <% flowersArr.forEach(function(flower){ %>    
+      <div class="col-md-4">
+        <div class="thumbnail">
+          <a  href="<%=flower.path %>" target="_blank">
+            <img  src="<%=flower.path %>"  style="width:100%">
+            <div class="caption">
+              <p> <%= flower.descreption %></p>
+              <p><%= flower.color %></p>
+              <p><%= flower.cost %></p>
+            </div>
+          </a>
+        </div>
+      </div>
+     <% }); %> 
+    </div>
+  </div>

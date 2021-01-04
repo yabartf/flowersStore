@@ -1,0 +1,10 @@
+{
+   "branches" : [{"manager":{"name" : "yair", "lastname":"bartfeld"},
+    "address":"Havaad Haleumi",
+    "branch_name":"castle"},
+    {"manager":{"name" : "avi", "lastname":"ronzt"},
+    "address":"tamar",
+    "branch_name":"gina"}
+]
+
+}
