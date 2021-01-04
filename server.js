@@ -43,11 +43,13 @@ app.post("/add", (req,res) =>{
 	res.send(200);
 });
 
-app.post("/update", (req,res) => {
+app.post("/update/:user", (req,res) => {
+	let us = roleByName(req.params.user);
 	req.on('data', details =>{
-		let temp;		
 		data = JSON.parse(details.toString());				
-		let rol = role(data);					
+		let rol = role(data);							
+		if ((us == "employee" && rol == "customer") || us == "manager") {		
+		let temp;		
 		users[rol + "s"].forEach(element => {			
 			if (element.userName == data.username) {				
 				element.active = false;
@@ -58,13 +60,17 @@ app.post("/update", (req,res) => {
 		fs.writeFile("./public/data/users.json",JSON.stringify(users),(err)=>{			
 			console.log(err);
 		});
-		res.send(200);
-		res.end;
+		res.send(200);		
+	}
+	else
+	res.send(400);
+	res.end;
 	});
 });
 
-app.post("/deleteUser",(req,res) =>{	
-	req.on('data', details =>{		
+app.post("/deleteUser/:user",(req,res) =>{	
+	if (roleByName(req.params.user) == "manager") {
+	req.on('data', details =>{				
 		data = JSON.parse(details.toString());				
 		let rol = role(data);				
 		users[rol + "s"].forEach(element => {			
@@ -78,20 +84,30 @@ app.post("/deleteUser",(req,res) =>{
 		res.send(200);
 		res.end;
 	});
+	}
 	res.end;
 });
 
-app.get("/manageUsers",(req,res) =>{
+app.get("/manageUsers/:user",(req,res) =>{
+	let rol = roleByName(req.params.user);	
+	if (rol != "") {
 	managers = users.managers;
 	customers = users.customers;
 	employees = users.employees;	
-	let isManager = true;
+	let isManager = (rol == "manager");
 	res.render("manage_users.ejs",{managers,customers,employees,isManager});
+	}
+	res.send(400);
 });
 
-app.get('/catalog',(req,res) =>{
+app.get('/catalog/:user',(req,res) =>{
+	let rol = roleByName(req.params.user);	
 	flowersArr = flowers.images;
-	res.render("catalog.ejs",flowersArr);
+	if (rol != "")
+		res.render("catalog.ejs",flowersArr);
+	else
+		res.send(400);
+	res.end;
 	//res.render("about.ejs");	
 });
 
@@ -99,12 +115,22 @@ app.get('/about',(req, res) =>  {
 	res.render("about.ejs",{role : role});		
 });
 
+app.get('/contact',(req, res) =>  {
+	res.render("contact.ejs");		
+});
+
 app.get('/role/:username',(req, res) =>  {
 	res.end(roleByName(req.params["username"]));		
 });
 
-app.get('/Manage_branches',(req,res) =>{
-	res.send(branches);
+app.get('/Manage_branches/:user',(req,res) =>{
+	let rol = roleByName(req.params.user);
+	console.log(rol);
+	if (rol == "manager") {
+		res.send(branches);	
+	}
+	else
+		res.send(400);
 	res.end;
 });
 app.post('/login',(req, res) =>  {	

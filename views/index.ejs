@@ -51,11 +51,21 @@ function callAbout() {
   $("#main").load("about");   
 }
 
-$(document).ready(()=> {            
+$(document).ready(()=> {    
+  $("#logout").hide();                   
   $("#login").click(function(){
         $("#myModal").modal();
-  });  
-  switch (location.hash) {
+  });   
+  let url_Str = location.href;
+  let url = new URL(url_Str);
+  let search_params = url.searchParams;
+  user = search_params.get('user');
+  console.log(user);
+  if ( user != undefined){
+    $.get("/role/" + user, function (data,status,xhr){
+      updateButton(data,true);
+    });
+  switch (location.hash.slice(1)) {
     case "":
       callAbout();
       break;
@@ -71,9 +81,20 @@ $(document).ready(()=> {
     case "About":
       callAbout();
       break;
+    case "Contact":
+      contactClick();
+      break;
     default:
       break;
   }
+}
+else{
+  if (location.hash.slice(1) == "Contact") {
+    contactClick();
+  }
+  else
+  callAbout();
+}
 });
 
 
@@ -94,10 +115,14 @@ $(document).ready(()=> {
       alert(response.statusText);
     }
     else{   
-         $.get("/role/" + user, function (data,status,xhr){
-          console.log("response");
-          user = data;                 
-          updateButton(user,true);          
+         $.get("/role/" + user, function (data,status,xhr){          
+          var url = new URL(window.location.href);
+          search_params = url.searchParams;
+          search_params.set("user", user);
+          url.search = search_params.toString();
+          var new_url = url.toString();
+          location.href = new_url;                       
+          updateButton(data,true);          
           //$("#myModal").closest();
         });            
  }});
@@ -105,12 +130,8 @@ $(document).ready(()=> {
 function updateButton(str, log){
   if (log) {    
     $("#login").hide();  
-    $("#logout").show();  
-  }
-  else{
-    $("#logout").hide(); 
-    $("#login").show();  
-  }
+    $("#logout").show();    
+    
   document.getElementById("catalogButton").hidden = false;      
   if (str == "manager"){
     document.getElementById("manageUsersButton").hidden = false;      
@@ -119,14 +140,26 @@ function updateButton(str, log){
   if (data = "employee") {          
        document.getElementById("manageUsersButton").hidden = false;                 
    }
+  }
+  else{
+  $("#login").show();  
+  $("#logout").hide();  
+  }
 }
 function logoutClick(){
   user = "";
+  callAbout();
+  var url = new URL(window.location.href);
+  search_params = url.searchParams;
+  search_params.set("user", "");
+  url.search = search_params.toString();
+  var new_url = url.toString();
+  location.href = new_url;                       
   updateButton(user,false);
-  location.hash = "";
+  
 }
 async function Manage_branchesClick(){
-  await fetch("http://localhost:8080/Manage_branches").then(response => {
+  await fetch("http://localhost:8080/Manage_branches/" + user).then(response => {
     if (!response.ok) {
       alert(response.statusText);
     }
@@ -190,20 +223,20 @@ async  function catalogClick() {
     while (document.getElementById("main").firstChild) {
           document.getElementById("main").removeChild(document.getElementById("main").firstChild)
         }
-     await   $("#main").load("catalog");
+     await   $("#main").load("catalog/" + user);
       }
 async function manageUsersClick(){
   while (document.getElementById("main").firstChild) {
           document.getElementById("main").removeChild(document.getElementById("main").firstChild)
         }
-     await $('#main').load("manageUsers");
+     await $('#main').load("manageUsers/"+ user);
 }
 async function deleteUserClick(elm){
   while (document.getElementById("main").firstChild) {
           document.getElementById("main").removeChild(document.getElementById("main").firstChild)
         }
   let node = elm.closest("#node");  
-  await fetch("http://localhost:8080/deleteUser",{
+  await fetch("http://localhost:8080/deleteUser/" + user,{
     method:'POST',
     headers: {
       'Accept': 'application/json',
@@ -212,7 +245,7 @@ async function deleteUserClick(elm){
     body :JSON.stringify({username: node.children[0].innerHTML, password: node.children[1].innerHTML})}).then(res =>
          {                      
           console.log("load users");
-          $("#main").load("manageUsers");
+          $("#main").load("manageUsers/" + user);
         }      
     );  
 }
@@ -229,7 +262,7 @@ function managerClick(elm) {
   update(node, "manager");
 }
 async function update(node,role) {
-  await fetch("http://localhost:8080/update",{
+  await fetch("http://localhost:8080/update/" + user,{
     method:'POST',
     headers: {
       'Accept': 'application/json',
@@ -239,11 +272,13 @@ async function update(node,role) {
     newrole:role})}).then(res =>
          {                      
           console.log("load users");
-          $("#main").load("manageUsers");
+          $("#main").load("manageUsers/" + user);
         }      
     );  
 }
-
+function contactClick() {
+  $("#main").load("contact");
+}
 
   </script>
 </html>
