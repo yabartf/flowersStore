@@ -23,8 +23,8 @@
               <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
               Manager <span class="caret"></span></button>
               <ul class="dropdown-menu" role="menu">
-                <li><button type="button" onclick="employeeClick(this)" class="btn btn-primary">Employee</button></li>
-                <li><button type="button" onclick="customerClick(this)" class="btn btn-primary">Customers</button></li>
+                <li onclick="employeeClick(this)"><button type="button" onclick="employeeClick(this)" style="width: auto;" class="btn btn-primary">Employee</button></li>
+                <li onclick="customerClick(this)"><button type="button" onclick="customerClick(this)"  style="width:auto;" class="btn btn-primary">Customers</button></li>
               </ul>
             </div>
           </div>
@@ -132,7 +132,7 @@
     newUser["active"] = true;
     let selected = document.getElementById("role");
     let role = selected.options[selected.selectedIndex].text;
-    await fetch("http://localhost:8080/add",{
+    await fetch("http://localhost:3000/add",{
     method:'POST',
     headers: {
       'Accept': 'application/json',
@@ -152,7 +152,7 @@
     $('button').prop('disabled', false);
 }
 function refreshClick() {
-  $("#main").load("manageUsers");
+  $("#main").load("manageUsers" + user);
 }
 </script>
 

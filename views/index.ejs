@@ -18,7 +18,7 @@
           <h4><span class="glyphicon glyphicon-lock"></span> Login</h4>
         </div>
         <div class="modal-body" style="padding:40px 50px;">
-          <form method="post" action="http://localhost:8080/login">
+          <form >
             <div class="form-group">
               <label for="username"><span class="glyphicon glyphicon-user"></span> Username</label>
               <input type="text" class="form-control" name="username" id="username" placeholder="Enter email">
@@ -44,7 +44,8 @@
 
   </div>
 </body>
-<script>   
+<script>  
+
 var user ;
 var password;
 function callAbout() {
@@ -54,14 +55,14 @@ function callAbout() {
 $(document).ready(()=> {    
   $("#logout").hide();                   
   $("#login").click(function(){
-        $("#myModal").modal();
+        $("#myModal").modal({});
   });   
   let url_Str = location.href;
   let url = new URL(url_Str);
   let search_params = url.searchParams;
   user = search_params.get('user');
-  console.log(user);
-  if ( user != undefined){
+  
+  if ( user != null){
     $.get("/role/" + user, function (data,status,xhr){
       updateButton(data,true);
     });
@@ -102,7 +103,7 @@ else{
    user = $("#username").val(); 
    password = $("#psw").val();     
    let us = {username : user , password: password};
-   await fetch('http://localhost:8080/login',{
+   await fetch('http://localhost:3000/login',{
     method:'POST',
     headers: {
       'Accept': 'application/json',
@@ -137,7 +138,7 @@ function updateButton(str, log){
     document.getElementById("manageUsersButton").hidden = false;      
     document.getElementById("manageBranchesButton").hidden = false;
   }
-  if (data = "employee") {          
+  if (str = "employee") {          
        document.getElementById("manageUsersButton").hidden = false;                 
    }
   }
@@ -159,13 +160,13 @@ function logoutClick(){
   
 }
 async function Manage_branchesClick(){
-  await fetch("http://localhost:8080/Manage_branches/" + user).then(response => {
-    if (!response.ok) {
-      alert(response.statusText);
+  $.get("/Manage_branches/" + user, function (data,status,xhr)  {
+    if (!status) {
+      console.log("no good");
+      alert(status.toString());
     }
-    else{   
-      //$("#main").load("Manage_branchesHTML");                  
-      response.json().then(branchs => {
+    else{                                         
+        let branchs = data;
         var table = document.createElement("TABLE");
         table.setAttribute("id","tableB");
         table.setAttribute("class","table");
@@ -197,12 +198,9 @@ async function Manage_branchesClick(){
           document.getElementById("main").removeChild(document.getElementById("main").firstChild)
         }
         document.getElementById("main").appendChild(table);
-        console.log(branchs);
-        console.log(branchs["branches"]);
-        
-        
-        for (let i = 0; i < branchs["branches"].length; i++) {
-          let branch = branchs["branches"][i];
+   
+        for (let i = 0; i < branchs.length; i++) {
+          let branch = branchs[i];
           var row = table.insertRow(table.length);
           var cell0 = row.insertCell( 0);
           var cell1 = row.insertCell(1);
@@ -210,12 +208,12 @@ async function Manage_branchesClick(){
           var cell3 = row.insertCell(3);
           var cell4 = row.insertCell(4);
           cell0.innerHTML = "" + i;
-          cell1.innerHTML = branch.manager.name;
-          cell2.innerHTML = branch.manager.lastname;
-          cell3.innerHTML = branch.address;
-          cell4.innerHTML = branch.branch_name;
+          cell1.innerHTML = branchs[i].managerFirstName;
+          cell2.innerHTML = branchs[i].managerLastName;
+          cell3.innerHTML = branchs[i].address;
+          cell4.innerHTML = branchs[i].branch_name;
         }
-        });
+    //  }); 
       }
     })
   }
@@ -223,8 +221,14 @@ async  function catalogClick() {
     while (document.getElementById("main").firstChild) {
           document.getElementById("main").removeChild(document.getElementById("main").firstChild)
         }
-     await   $("#main").load("catalog/" + user);
-      }
+     await   $("#main").load("catalog/" + user);         
+  }
+async function sub() {
+  $.get('/');
+  catalogClick();
+}
+
+
 async function manageUsersClick(){
   while (document.getElementById("main").firstChild) {
           document.getElementById("main").removeChild(document.getElementById("main").firstChild)
@@ -236,7 +240,7 @@ async function deleteUserClick(elm){
           document.getElementById("main").removeChild(document.getElementById("main").firstChild)
         }
   let node = elm.closest("#node");  
-  await fetch("http://localhost:8080/deleteUser/" + user,{
+  await fetch("http://localhost:3000/deleteUser/" + user,{
     method:'POST',
     headers: {
       'Accept': 'application/json',
@@ -262,7 +266,7 @@ function managerClick(elm) {
   update(node, "manager");
 }
 async function update(node,role) {
-  await fetch("http://localhost:8080/update/" + user,{
+  await fetch("http://localhost:3000/update/" + user,{
     method:'POST',
     headers: {
       'Accept': 'application/json',

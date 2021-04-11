@@ -5,15 +5,35 @@
       <div class="col-md-4">
         <div class="thumbnail">
           <a  href="<%=flower.path %>" target="_blank">
-            <img  src="<%=flower.path %>"  style="width:100%">
-            <div class="caption">
-              <p> <%= flower.descreption %></p>
-              <p><%= flower.color %></p>
-              <p><%= flower.cost %></p>
-            </div>
+            <img  src="<%=flower.path %>"  style="width:100%;height: 400px;">
           </a>
+            <div class="caption">
+              <p>Descreption: <%= flower.descreption %></p>
+              <p>Color: <%= flower.color %></p>
+              <p>Cost: <%= flower.cost %>$</p>
+            </div>
+          
         </div>
       </div>
      <% }); %> 
+     <div class="col-md-4">
+      <div class="thumbnail">
+        <form action="/upload-image" enctype="multipart/form-data"  method="POST" id="addFlower">
+      <div class="form-group">
+        <input type="file" class="form-contorl" name="uploaded_file">
+        <input type="text" class="form-control" name="url" placeholder="url-file">
+        <input type="text" class="form-control" placeholder="descreption" name="descreption">
+        <input type="number" class="form-control" name="cost" placeholder="cost">
+        <input type="text" class="form-control" name="color" placeholder="color">
+        <input type="submit" onclick="sub()" value="submit"  class="btn btn-default">
+      </div>
+      </form>
+        </div>
+     </div>
     </div>
   </div>
+<script>
+
+
+</script>
+  
